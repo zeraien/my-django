@@ -1,0 +1,107 @@
+{% if perms.textblocks.change_textblock %}
+<style type="text/css">
+.textblock:hover .editlink
+{
+	display: inline;
+}
+.textblock .editlink a
+{
+	font-weight: bold;
+	color: #cc3300;
+}
+
+.textblock:hover
+{
+/*    border: 1px solid #ebebeb;*/
+/*    margin: -2px;*/
+/*    padding: 3px;*/
+    background-color: #ebebeb;
+}
+.textblock_form form textarea, .textblock_form form input
+{
+	font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+	font-size: 11px;
+}
+.textblock span.empty, .textblock .editlink a
+{
+    font-size: 11px;
+}
+.textblock.faded { color: #999; }
+.textblock
+{
+    position: relative;
+}
+.textblock .editlink
+{
+    position: absolute;
+    display: none;
+    right: 0;
+    top: 0;
+    padding: 2px;
+    z-index: 9999;
+}
+</style>
+<script type="text/javascript">
+
+function load_textblock_inline_editor(div, url)
+{
+	div.set('load', {
+		evalScripts: true,
+	});
+	div.load(url);
+	return false;
+}
+
+function submit_textblock_inline_form(form)
+{
+	form.getChildren('input[type="submit"], button').each(function(item, i)
+	{
+		item.setStyle('opacity','0.5');
+		item.setAttribute('disabled',true);
+		item.setAttribute('enabled',false);
+	});
+
+	form.set('send', {
+		evalScripts: true,
+		onSuccess: function(res) {
+			form.getParent().getParent().set('html',res);
+		}
+	});
+	form.send();
+	return false;
+}
+
+function go_textblock(self, url)
+{
+	window.location = self.getSelected()[0].get('name');
+}
+
+function submit_textblock_template(div_id, url)
+{
+	var form = $(div_id).getElement('.template_form');
+	var template = decodeURIComponent(form['content'].value);
+	form.getElements('input').each(function(field)
+	{
+		template = template.replace("[["+field.name+"]]", field.value);
+	});
+	form['content'].value = template;
+	return true;
+}
+
+function show_textblock_template_fields(self, position)
+{
+    var div_id = position+"_fields_"+self.getSelected()[0].get('name');
+
+ 	$$(".template_fields").each(function(the_div){
+		the_div.setStyle('display',"none");
+	});
+
+ 	var textblock = $(position+"_new_textblock");
+
+	textblock.removeEvents('mouseover');
+	textblock.removeEvents('mouseout');
+	textblock.removeClass("faded");
+	$(div_id).setStyle('display',"block");
+}
+</script>
+{% endif %}
