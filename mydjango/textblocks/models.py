@@ -5,6 +5,10 @@ from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 
+from django.conf import settings
+
+from django.contrib.markup.templatetags import markup
+
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
@@ -29,7 +33,7 @@ class TextBlockManager(models.Manager):
                 q |= Q(url='%s*' % query_url)
                 query_url += '/'
         
-        base_qs = self.filter(is_hidden=False).distinct()
+        base_qs = self.select_related(depth=1).filter(is_hidden=False).distinct()
 
         hidden_tbs = URLItem.objects.filter(is_hidden=True).filter(q).filter(**kwargs).distinct()
 
@@ -46,9 +50,9 @@ class TextBlock(models.Model):
     url = models.CharField(_('URL'),max_length=255,help_text=_("This is a URL to the page(s) where this text block will appear. Specify the full URL of the page, or to display on all pages beneath a certain path, add an asterisk (*) at the end of the URL. Best way to create or edit a text block, is to go to the page in question and click the edit link next to the text block you wish to edit or create."),db_column="slug", db_index=True)
     position = models.SlugField(_("position"),max_length=50, help_text=_("Where on the page will this text block appear."),unique=False,db_index=True)
     note = models.CharField(_('note'),max_length=255,help_text=_("This should contain some information about what page this text block applies to."), blank=True, null=True)
-    content = models.TextField(_('content'), help_text=_("Use any markup language that you can select below."), blank=True, null=True)
+    content = models.TextField(_('content'), help_text=_("Use the markup language that you have selected below."), blank=True, null=True)
     html = models.TextField(editable=False, blank=True)
-    language = models.CharField(max_length=5,verbose_name=_('language code'),default='sv', blank=True, null=True)
+    language = models.CharField(max_length=5, verbose_name=_('language code'), default=settings.LANGUAGE_CODE, blank=True, null=True)
     markup_language = models.CharField(_("markup language"),max_length=10,default="markdown",choices=(('textile',_("Textile")), ("markdown",_("Markdown")), (None,_("HTML only"))),blank=True,null=True)
 
     sort_order = models.SmallIntegerField(_("sort order"), default=0)
@@ -90,7 +94,6 @@ class TextBlock(models.Model):
         #unique_together = ('url','position')
 
 def textblock_pre_save(sender, instance, **kwargs):
-    from django.contrib.markup.templatetags import markup
 
     if hasattr(cache._cache, 'flush_all'):
         cache._cache.flush_all()
@@ -110,7 +113,24 @@ pre_save.connect(textblock_pre_save, sender=TextBlock)
 #     sort_order = models.SmallIntegerField(_("sort order"))
 #     placeholder = models.SlugField(_("placeholder"),unique=False, db_index=True)
 #     is_hidden = models.BooleanField(_("hidden"), default=False)
-#         
+#
+
+class Content(models.Model):
+    class Meta:
+        verbose_name = _("Content")
+        verbose_name_plural = _("Content entries")
+    textblock = models.ForeignKey(TextBlock, related_name="localized_content")
+    content = models.TextField(_('content'), help_text=_("Use the markup language that you have selected below."), blank=True, null=True)
+    html = models.TextField(editable=False, blank=True)
+    language_code = models.CharField(max_length=5, verbose_name=_('language code'), default=settings.LANGUAGE_CODE, blank=True, null=True)
+    markup_language = models.CharField(_("markup language"),max_length=10,default="markdown",choices=(('textile',_("Textile")), ("markdown",_("Markdown")), (None,_("HTML only"))),blank=True,null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return "content for %s" % self.textblock
+
+
 class URLItem(models.Model):
     url = models.CharField(_('URL'),max_length=255)
     sort_order = models.SmallIntegerField(_("sort order"), default=0)

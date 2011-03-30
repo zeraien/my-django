@@ -3,12 +3,21 @@ from django.shortcuts import get_object_or_404
 from mydjango.textblocks.models import TextBlock, TextBlockTemplate
 from mydjango.logging import log
 from django.template import Context, loader
+from django.core.cache import cache
 
 class TextblockController(ActionController):
+	controller_prefix = "_"
+
 	def _before_filter(self):
 		if not self._request.user.has_perm('textblocks.change_textblock'):
 			return 'Not logged in'
 		return None
+	
+	def reset_cache(self,request):
+		if hasattr(cache._cache, 'flush_all'):
+			cache._cache.flush_all()
+			return "OK!"
+		return "Not flushable cache... Just wait, or restart the server?"
 	
 	def display(self, request, id):
 		textblock = get_object_or_404(TextBlock.objects,id=id)
@@ -49,6 +58,7 @@ class TextblockController(ActionController):
 		textblock_id = request.POST.get('id')
 		textblock = get_object_or_404(TextBlock.objects,id=textblock_id)
 		textblock.content = request.POST.get('content')
+		textblock.language = request.POST.get('language', textblock.language)
 		textblock.save()
 		self._object = textblock
 		return self._redirect(action='display',id=textblock.pk)
