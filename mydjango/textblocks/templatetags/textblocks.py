@@ -25,17 +25,21 @@ def parse_as_template(textblock, context):
         log.exception_warn("Failed to render text block template.")
     return ''
 
-def _get_textblock(context, url, position, raw = False, exclude_url_parts = 0, host = ''):
+def _get_textblock(context, url, position, raw = False, exclude_url_parts = 0, host = None):
+    if host is None:
+        host = context['request'].get_host()
+        
+    if url is None: url = '*'
     url = url.strip()
-    position = slugify(position)
-    if url == '':
-        url = '/'
+    if url == '': url = '/'
     elif url[0:4] == "url:":
         parts = url.split('/',1)
         url_part = parts[0].split(':')[1]
         if len(parts) > 1:
             after_part = parts[1]
         url = u"%s/%s" % (reverse(url_part).rstrip('/'), after_part)
+    
+    position = slugify(position)
     
     new_sort_order = 0;
     _cache_str = 'textblock_%s_%s_%s' % (url, position, host)
@@ -93,11 +97,16 @@ def textstring(name):
         pass
 
 @register.inclusion_tag('_textblock.html',takes_context=True)
+def named_textblock(context, name):
+    return _get_textblock(context=context, url=None, position=name)
+
+@register.inclusion_tag('_textblock.html',takes_context=True)
 def textblock(context, position, exclude_url_parts = 0):
-    return _get_textblock(context=context, url=context['request'].path, position=position, exclude_url_parts=exclude_url_parts, host=context['request'].get_host())
+    return _get_textblock(context=context, url=context['request'].path, position=position, exclude_url_parts=exclude_url_parts)
 
 @register.inclusion_tag('_textblock.html',takes_context=True)
 def text_block(context, slug):
+    """@deprecated"""
     try:
         cache_id = "text_block_html_%s" %slug
         content = cache.get(cache_id)
@@ -119,6 +128,7 @@ def text_block(context, slug):
     
 @register.simple_tag
 def text_block_raw(slug):
+    """@deprecated"""
     try:
         slug = slugify(slug)
         cache_id = "text_block_%s" %slug
