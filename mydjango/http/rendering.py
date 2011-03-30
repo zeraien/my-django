@@ -56,6 +56,7 @@ def render_to(template_name):
         @wraps(func)
         def wrapper(request, *args, **kw):
             output = func(request, *args, **kw)
+            output['request'] = request
             if not isinstance(output, dict):
                 return output
             return render(request, template=template_name, context=output)
