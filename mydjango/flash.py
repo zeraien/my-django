@@ -60,7 +60,12 @@ class FlashManager(object):
         self.append(msg, 'error')
         
     def append(self, msg, msg_type = 'normal'):
-        self.messages.append( FlashMessage( **{'message':msg, 'kind': msg_type, 'is_error':msg_type=='error'}) )
+        new_message = FlashMessage( **{'message':msg, 'kind': msg_type, 'is_error':msg_type=='error'})
+        new_hash = new_message.hash()
+        for message in self.messages:
+            if message.hash()==new_hash:
+                return
+        self.messages.append( new_message )
         self.request.session[self.SESSION_KEY] = self.messages
     def set(self, msg, msg_type = 'normal'):
         self.append(msg, msg_type)
