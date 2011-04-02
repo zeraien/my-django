@@ -1,5 +1,5 @@
 import os.path
-import json as simplejson
+import json
 
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
@@ -48,7 +48,7 @@ def render_json(view_func):
         if not isinstance(_json, str) and not isinstance(_json, dict) and not isinstance(_json, list) and not isinstance(_json, tuple):
             return _json
         mimetype = request.is_ajax() and "application/json" or "text/plain"
-        return HttpResponse(simplejson.dumps(_json), mimetype=mimetype)
+        return HttpResponse(json.dumps(_json), mimetype=mimetype)
     return wrapper
 
 def render_to(template_name):

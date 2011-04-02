@@ -12,10 +12,10 @@
 
 .textblock:hover
 {
-/*    border: 1px solid #ebebeb;*/
-/*    margin: -2px;*/
-/*    padding: 3px;*/
-    background-color: #ebebeb;
+	border-color: #ebebeb;
+	border-style: dashed;
+    border-width: 1px;
+    margin: -1px;
 }
 .textblock_form form textarea, .textblock_form form input
 {
@@ -103,5 +103,6 @@ function show_textblock_template_fields(self, position)
 	textblock.removeClass("faded");
 	$(div_id).setStyle('display',"block");
 }
+
 </script>
 {% endif %}
