@@ -20,20 +20,18 @@ Decorators:
 Allows for dynamic content on your Django site.
 
 To add this to your site, do the following in your base template:
-{{{
+`
 {% load textblocks %}
 {% load_textblock_support %}
-}}}
+`
 
 Place your textblocks:
 
-{{{
-{% load textblocks %}
+`{% load textblocks %}`
 
-{% textblock "main" %}
+`{% textblock "main" %}`
 
-{% named_textbock "unique_name" %}
-}}}
+`{% named_textbock "unique_name" %}`
 
 Textblocks are automatically limited to the URL on which they are created.
 You can use * as a wildcard symbol.
