@@ -20,8 +20,10 @@ Decorators:
 Allows for dynamic content on your Django site.
 
 To add this to your site, do the following in your base template:
+
 `
 {% load textblocks %}
+
 {% load_textblock_support %}
 `
 
