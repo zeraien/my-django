@@ -5,9 +5,11 @@ This package contains a number of useful add-ons for the Django (www.djangoproje
 ## http
 
 Helper functions and decorators for django views.
+
 * render - similar to django's rendering shortcut, but more robust and better. Uses the "RequestContext" for rendering.
 
 Decorators:
+
 * @render_to("TEMPLATE_NAME")  - return a dictionary of values to export into the specified template, uses above render function to render.
 * @render_json - anything returned from this function is converted into JSON (has to be a JSON encodable data structure or variable)
 * @redirect - redirects to a URL that is returned from the view
