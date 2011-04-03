@@ -24,16 +24,29 @@ To add this to your site, do the following in your base template:
 	{% load textblocks %}
 	{% load_textblock_support %}
 
-Place your textblocks:
+Put a textblock creator link on your base template:
 
-	{% load textblocks %}
+    {% textblock_creator %}
 
+Place text block placeholders around your site:
+
+	{% textblock "header" %}
+	
+	{% textblock "sidebar" %}
+	
 	{% textblock "main" %}
+	
+	{% textblock "footer" %}
 
-	{% named_textbock "unique_name" %}
+	{% named_textbock "unique_name" "sidebar" %}
+	
+	{% named_textbock "unique_name" "footer" %}
 
-Textblocks are automatically limited to the URL on which they are created.
-You can use * as a wildcard symbol.
+Text blocks are automatically limited to the URL on which they are created.
+You can use * as a wildcard symbol in URL's.
+
+Once you have created some text blocks, they can be dragged around between different text block placeholders around the page, and their content
+can be edited inline without having to leave the page.
 
 **NOTE:** Requires mootools 1.2
 
