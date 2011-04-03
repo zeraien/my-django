@@ -70,13 +70,13 @@
 function _textblock_edit(textblock_id, url)
 {
     _textblock_disable_dnd();
-    __textblock_inline_editor($('textblock_'+textblock_id), url);
+    __textblock_inline_editor($('textblock_'+textblock_id).getParent(), url);
     return false;
 }
 function _textblock_cancel_editing(textblock_id, url)
 {
     _textblock_enable_dnd();
-    __textblock_inline_editor($('editing_'+textblock_id).getParent(), url);
+    __textblock_inline_editor($('textblock_editing_'+textblock_id).getParent(), url);
 }
 
 function __textblock_inline_editor(div, url)

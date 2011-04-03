@@ -2,6 +2,7 @@
 {% for textblock in textblocks %}
 	{% if can_edit %}
 		{% spaceless %}
+		<div>
     		<div class="textblock draggable" id="textblock_{{textblock.pk}}" title="{{textblock.get_name}}" _id="{{textblock.pk}}">
     			<div class="textblock_drop_point" _position="{{textblock.position}}" _order="{{textblock.sort_order}}" _id="{{textblock.pk}}">&#160;</div>
     			<a name="textblock_{{textblock.position}}"></a>
@@ -14,6 +15,7 @@
     				{{_("Empty textblock")}}
     			{% endif %}
     		</div>
+		</div>
 		{% endspaceless %}
 	{% else %}
 		{% if textblock.html %}
