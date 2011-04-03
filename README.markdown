@@ -37,6 +37,8 @@ You can use * as a wildcard symbol.
 
 **NOTE:** Requires mootools 1.2
 
+For non-superusers, you can give the user in question *Can change text block* permission. 
+
 ## logging
 
 A basic logging framework for logging to the database.
