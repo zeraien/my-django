@@ -1,4 +1,5 @@
 {% if perms.textblocks.change_textblock %}
+{% load url from future %}
 <style type="text/css">
 .textblock:hover .editlink
 {
@@ -31,6 +32,29 @@
 {
     position: relative;
 }
+.textblock.drag_active
+{
+	cursor: move;
+}
+
+.textblock_drop_point.active
+{
+	border: 1px dotted #036;
+}
+.textblock_drop_point.over
+{
+	border-width: 3px;
+	background-color: #ccc;
+}
+
+.textblock_drop_point
+{
+    position: relative;
+}
+.textblock.being_dragged
+{
+    opacity: 0.5;
+}
 .textblock .editlink
 {
     position: absolute;
@@ -43,10 +67,23 @@
 </style>
 <script type="text/javascript">
 
-function load_textblock_inline_editor(div, url)
+function _textblock_edit(textblock_id, url)
+{
+    _textblock_disable_dnd();
+    __textblock_inline_editor($('textblock_'+textblock_id), url);
+    return false;
+}
+function _textblock_cancel_editing(textblock_id, url)
+{
+    _textblock_enable_dnd();
+    __textblock_inline_editor($('editing_'+textblock_id).getParent(), url);
+}
+
+function __textblock_inline_editor(div, url)
 {
 	div.set('load', {
 		evalScripts: true,
+		data: null
 	});
 	div.load(url);
 	return false;
@@ -54,6 +91,7 @@ function load_textblock_inline_editor(div, url)
 
 function submit_textblock_inline_form(form)
 {
+    _textblock_enable_dnd();
 	form.getChildren('input[type="submit"], button').each(function(item, i)
 	{
 		item.setStyle('opacity','0.5');
@@ -104,5 +142,118 @@ function show_textblock_template_fields(self, position)
 	$(div_id).setStyle('display',"block");
 }
 
+function _textblock_check_drop_point(draggable, droppable)
+{
+    var draggable_id = draggable.get("_id");
+    var droppable_id = droppable.get("_id");
+    if (draggable_id == droppable_id)
+        return false;
+    else
+        return true;
+}
+
+var _textblock_drag_n_drop_enabled = false;
+var _textblock_drag_n_drop_elements = new Array();
+var _textblock_is_dragging = false;
+var _textblock_original_position = {x:0,y:0};
+
+function _textblock_disable_dnd()
+{
+    if (_textblock_drag_n_drop_enabled)
+    {
+        _textblock_drag_n_drop_elements.each(function(drag) {
+            drag.detach();
+            drag.element.removeClass('drag_active');
+        });
+        _textblock_drag_n_drop_elements.empty();
+        _textblock_drag_n_drop_enabled = false;
+    }
+}
+function _textblock_enable_dnd()
+{
+    if (!_textblock_drag_n_drop_enabled)
+    {
+        _textblock_drag_n_drop_enabled = true;
+        $$('.textblock.draggable').each(function(drag) {
+
+            drag.addClass('drag_active');
+            drag.setStyles({ 'top':0, 'left':0 });
+
+            _textblock_drag_n_drop_elements.push(
+                new Drag.Move(drag, { 
+                    droppables: '.textblock_drop_point',
+                    precalculate: true, 
+                    onDrop: function(el,droppable) {
+                        if (!droppable || !_textblock_check_drop_point(el, droppable))
+                        {
+                            el.setPosition(_textblock_original_position);
+                            return;
+                        }
+                        var request = new Request({
+                            url: '{% url "textblock_drop" %}',
+                            data: "id="+drag.get('_id')+"&drop_position="+droppable.get('_position')+"&drop_sort_order="+droppable.get("_order"),
+                            method: "post",
+                            onSuccess: function(response)
+                            {
+                                window.location.reload();
+                            }
+                        });
+
+                        request.send();
+                    },
+                    onComplete: function(el)
+                    {
+                        el.removeClass("being_dragged");
+                        _textblock_is_dragging = false;
+                        $$(".textblock_drop_point").each(function(droppable)
+                        {
+                            droppable.removeClass('active');
+                        });
+                    },
+                    onCancel: function(el)
+                    {
+                        _textblock_is_dragging = false;
+                        el.removeClass("being_dragged");
+                        $$(".textblock_drop_point").each(function(droppable)
+                        {
+                            droppable.removeClass('active');
+                        });
+                    },
+                    onBeforeStart: function(el)
+                    {
+                        _textblock_original_position = el.getCoordinates();
+                        el.addClass("being_dragged");
+                        if (!_textblock_is_dragging)
+                        {
+                            _textblock_is_dragging = true;
+                            $$(".textblock_drop_point").each(function(droppable)
+                            {
+                                if (_textblock_check_drop_point(el, droppable))
+                                droppable.addClass('active');
+                            });
+                        }
+                    },
+                    onEnter: function(el,droppable) {
+                        if (_textblock_check_drop_point(el, droppable))
+                        {
+                            droppable.addClass('over');
+                        }
+                    },
+                    onLeave: function(el,droppable) {
+                        droppable.removeClass('over');
+                    }
+                })
+            );
+        });
+    }
+}
+
+window.addEvent("domready", function()
+{
+    document.ondragstart = function () { return false; }; //IE drag hack
+
+    //for every dragable image...
+    _textblock_enable_dnd();
+});
 </script>
 {% endif %}

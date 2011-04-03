@@ -1,22 +1,19 @@
 {% load textblocks %}{% load url from future %}
 {% for textblock in textblocks %}
-	{% if perms.textblocks.change_textblock %}
+	{% if can_edit %}
 		{% spaceless %}
-		<div class="textblock" id="textblock_{{textblock.pk}}" title="{{textblock.get_name}}">
-			<a name="textblock_{{textblock.position}}"></a>
-			<div class="editlink">
-				<a title="{{textblock.get_name}}" href="{{textblock.get_edit_url}}"
-				onclick="
-				return load_textblock_inline_editor($('textblock_{{textblock.pk}}'),
-				'{% url "textblock_edit" textblock.pk %}');"
-				>{{_("edit")}}</a>
-			</div>
-			{% if textblock.html %}
-				{% parse_as_template textblock context %}
-			{% else %}
-				{{_("Empty textblock")}}
-			{% endif %}
-		</div>
+    		<div class="textblock draggable" id="textblock_{{textblock.pk}}" title="{{textblock.get_name}}" _id="{{textblock.pk}}">
+    			<div class="textblock_drop_point" _position="{{textblock.position}}" _order="{{textblock.sort_order}}" _id="{{textblock.pk}}">&#160;</div>
+    			<a name="textblock_{{textblock.position}}"></a>
+    			<div class="editlink">
+    				<a href="{{textblock.get_edit_url}}" onclick="_textblock_edit({{textblock.pk}},'{% url "textblock_edit" textblock.pk %}'); return false;">{{_("edit")}}</a>
+    			</div>
+    			{% if textblock.html %}
+    				{% parse_as_template textblock context %}
+    			{% else %}
+    				{{_("Empty textblock")}}
+    			{% endif %}
+    		</div>
 		{% endspaceless %}
 	{% else %}
 		{% if textblock.html %}
@@ -26,50 +23,7 @@
 		{% endif %}
 	{% endif %}
 {% endfor %}
-{% if perms.textblocks.add_textblock and new_textblock and not view_options.hide_empty_textblocks %}
-{% load i18n %}
-<div class="textblock faded" id="{{position}}_new_textblock" title="{{new_textblock.get_name}}">
-	{% if templates.count %}
-	<select id="{{position}}_templates" onchange="show_textblock_template_fields(this, '{{position}}'); return true;">
-		<option name="">{{_("Select template")}}</option>
-		{% for template in templates %}
-			<option name="{{template.name}}">{{template.title}}</option>
-		{% endfor %}
-	</select>
-	{% endif %}
-	<div class="editlink">
-		<a title="{{new_textblock.get_name}}" href="{{new_textblock.get_edit_url}}">{{_("add")}}</a>
-	</div>
-	<div class="template_fields">
-		{% blocktrans with new_textblock.position as pos %}Add textblock for {{pos}}{% endblocktrans %}
-	</div>
-	{% for template in templates %}
-		<div id="{{position}}_fields_{{template.name}}" class="template_fields" style="display:none;">
-		<form id="{{position}}_form_{{template.name}}" class="required template_form" method="get" action="{{new_textblock.get_edit_url}}">
-			{% csrf_token %}
-			<input type="hidden" name="url" value="{{new_textblock.url}}"/>
-			<input type="hidden" name="sort_order" value="{{new_textblock.sort_order}}"/>
-			<input type="hidden" name="content" value="{{template.content|urlencode}}"/>
-			<input type="hidden" name="position" value="{{new_textblock.position}}"/>
-			
-			{% for field_name in template.get_available_fields %}
-				<label for="{{position}}_form_{{template.name}}_{{field_name}}">{{field_name}}</label>
-				<br/><input type="text" id="{{position}}_form_{{template.name}}_{{field_name}}" name="{{field_name}}" style="width:90%"/>
-				<br/>
-			{% endfor %}
-			<br/>
-			<input type="submit" onclick="return submit_textblock_template('{{position}}_fields_{{template.name}}','{% url "admin:textblocks_textblock_add" %}');" value="{%blocktrans with template.name as name%}Add {{name}}{% endblocktrans %}"/>
-		</form>
-		</div>
-	{% endfor %}
-
-
-	{# <select id="{{position}}_templates" onchange="go_textblock(this); return true;"> #}
-	{# 	<option name="">{{_("Select existing textblock")}}</option> #}
-	{# 	{% for textblock in named_textblocks %} #}
-	{# 		<option name="{% url admin:textblocks_textblock_change textblock.pk %}">{{textblock.note}}</option> #}
-	{# 	{% endfor %} #}
-	{# </select> #}
-
-</div>
+{% if not new_textblock %}
+    <div class="textblock_drop_point" _position="{{position}}" _order="0" _id="0">&#160;</div>
 {% endif %}
+{% include "_textblock_creator.html" %}

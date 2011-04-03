@@ -1,0 +1,48 @@
+{% load url from future %}
+{% if can_add and new_textblock and not view_options.hide_empty_textblocks %}
+{% load i18n %}
+<div class="textblock faded" id="{{position}}_new_textblock" title="{{new_textblock.get_name}}">
+	{% if templates.count %}
+	<select id="{{position}}_templates" onchange="show_textblock_template_fields(this, '{{position}}'); return true;">
+		<option name="">{{_("Select template")}}</option>
+		{% for template in templates %}
+			<option name="{{template.name}}">{{template.title}}</option>
+		{% endfor %}
+	</select>
+	{% endif %}
+	<div class="editlink">
+		<a title="{{new_textblock.get_name}}" href="{{new_textblock.get_edit_url}}">{{_("add")}}</a>
+	</div>
+	<div class="template_fields">
+		{% blocktrans with new_textblock.position as pos %}Add textblock for {{pos}}{% endblocktrans %}
+	</div>
+	{% for template in templates %}
+		<div id="{{position}}_fields_{{template.name}}" class="template_fields" style="display:none;">
+		<form id="{{position}}_form_{{template.name}}" class="required template_form" method="get" action="{{new_textblock.get_edit_url}}">
+			{% csrf_token %}
+			<input type="hidden" name="url" value="{{new_textblock.url}}"/>
+			<input type="hidden" name="sort_order" value="{{new_textblock.sort_order}}"/>
+			<input type="hidden" name="content" value="{{template.content|urlencode}}"/>
+			<input type="hidden" name="position" value="{{new_textblock.position}}"/>
+			
+			{% for field_name in template.get_available_fields %}
+				<label for="{{position}}_form_{{template.name}}_{{field_name}}">{{field_name}}</label>
+				<br/><input type="text" id="{{position}}_form_{{template.name}}_{{field_name}}" name="{{field_name}}" style="width:90%"/>
+				<br/>
+			{% endfor %}
+			<br/>
+			<input type="submit" onclick="return submit_textblock_template('{{position}}_fields_{{template.name}}','{% url "admin:textblocks_textblock_add" %}');" value="{%blocktrans with template.name as name%}Add {{name}}{% endblocktrans %}"/>
+		</form>
+		</div>
+	{% endfor %}
+
+
+	{# <select id="{{position}}_templates" onchange="go_textblock(this); return true;"> #}
+	{# 	<option name="">{{_("Select existing textblock")}}</option> #}
+	{# 	{% for textblock in named_textblocks %} #}
+	{# 		<option name="{% url "admin:textblocks_textblock_change" textblock.pk %}">{{textblock.note}}</option> #}
+	{# 	{% endfor %} #}
+	{# </select> #}
+
+</div>
+{% endif %}

@@ -94,9 +94,7 @@ class TextBlock(models.Model):
         #unique_together = ('url','position')
 
 def textblock_pre_save(sender, instance, **kwargs):
-
-    if hasattr(cache._cache, 'flush_all'):
-        cache._cache.flush_all()
+    cache.clear()
         
     if hasattr(markup, instance.markup_language):
         instance.html = getattr(markup, instance.markup_language)(instance.content)
