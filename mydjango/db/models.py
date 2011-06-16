@@ -48,5 +48,5 @@ class TimeStampedModel(models.Model):
     """
     class Meta:
         abstract = True
-    created_at = models.DateTimeField(default=datetime.datetime.now, blank=True, editable=False)
-    last_modified_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=datetime.datetime.now, blank=True, editable=False, db_index=True)
+    last_modified_at = models.DateTimeField(auto_now=True, db_index=True)
