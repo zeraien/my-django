@@ -89,10 +89,9 @@ def _get_textblock(context, url, position, raw = False, exclude_url_parts = 0, h
     new_context['named_textblocks'] = TextBlock.objects.exclude(note__isnull=True).exclude(note='').order_by('note')
     return new_context
 
-@register.simple_tag
+@register.inclusion_tag('_textblock_toggle_buttons.html',takes_context=False)
 def textblock_edit_mode_button():
-    return mark_safe("<div id='textblock_edit_mode_link' class='textblock_link_button'><a href='#' onclick='textblock_toggle_edit_mode();'>Edit Textblocks</a></div>")
-textblock_edit_mode_button.is_safe = True
+    return {}
 
 @register.simple_tag
 def textstring(name):

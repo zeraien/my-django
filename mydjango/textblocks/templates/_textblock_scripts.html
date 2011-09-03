@@ -17,20 +17,23 @@
     border-radius: 5px;
     padding: 5px;
     /*	width: 100px;*/
+    border: 1px solid #132145;
     text-align: center;
 }
-.textblock_link_button:hover
+.textblock_link_button.activated
 {
-	background-color: #99521A;
+	background-color: #69AD2E;
+    border: 1px solid #375B17;
 }
 
-#textblock_edit_mode_link
+
+#textblock_toggle_buttons
 {
 	position: absolute;
 	right: 10px;
 	top: 10px;
 }
-#textblock_edit_mode_link a, .textblock .editlink a 
+#textblock_toggle_buttons a, .textblock .editlink a 
 {
 	color: #fff;
 	font-weight: bold;
@@ -103,17 +106,39 @@
 
 var _textblock_edit_mode = false;
 
+function textblock_toggle_drag_n_drop_mode()
+{
+    if (_textblock_drag_n_drop_activated)
+    {
+        _textblock_drag_n_drop_activated = !_textblock_drag_n_drop_activated;
+        $('textblock_drag_n_drop_toggle_button').removeClass('activated');
+        _textblock_disable_dnd();
+    }
+    else
+    {
+        if (_textblock_edit_mode)
+            textblock_toggle_edit_mode();
+
+        _textblock_drag_n_drop_activated = !_textblock_drag_n_drop_activated;
+        $('textblock_drag_n_drop_toggle_button').addClass('activated');
+        _textblock_enable_dnd();
+    }
+}
+
 function textblock_toggle_edit_mode()
 {
     if (_textblock_edit_mode)
     {
-        _textblock_enable_dnd();
+        $('textblock_edit_mode_link').removeClass('activated');
         _textblock_edit_mode = false;
         $$(".edit_mode_listener").removeClass("active");
     }
     else
     {
-        _textblock_disable_dnd();
+        if (_textblock_drag_n_drop_activated)
+            textblock_toggle_drag_n_drop_mode();
+
+        $('textblock_edit_mode_link').addClass('activated');
         _textblock_edit_mode = true;
         $$(".edit_mode_listener").addClass("active");
     }
@@ -202,6 +227,7 @@ function _textblock_check_drop_point(draggable, droppable)
         return true;
 }
 
+var _textblock_drag_n_drop_activated = false;
 var _textblock_drag_n_drop_enabled = false;
 var _textblock_drag_n_drop_elements = new Array();
 var _textblock_is_dragging = false;
@@ -221,6 +247,9 @@ function _textblock_disable_dnd()
 }
 function _textblock_enable_dnd()
 {
+    if (!_textblock_drag_n_drop_activated)
+        return;
+        
     if (!_textblock_drag_n_drop_enabled)
     {
         _textblock_drag_n_drop_enabled = true;
