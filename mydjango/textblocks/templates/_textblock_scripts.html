@@ -324,9 +324,6 @@ function _textblock_enable_dnd()
 window.addEvent("domready", function()
 {
     document.ondragstart = function () { return false; }; //IE drag hack
-
-    //for every dragable image...
-    _textblock_enable_dnd();
 });
 </script>
 {% endif %}

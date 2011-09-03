@@ -1,5 +1,7 @@
+{% if perms.textblocks.change_textblock %}
 <div id='textblock_toggle_buttons'>
     <div id="textblock_edit_mode_link" class='textblock_link_button'><a href='#' onclick='textblock_toggle_edit_mode();'>Edit Textblocks</a></div>
     <br/>
     <div id="textblock_drag_n_drop_toggle_button" class='textblock_link_button'><a href='#' onclick='textblock_toggle_drag_n_drop_mode();'>Drag'n'Drop</a></div>
 </div>
+{% endif %}
