@@ -1,7 +1,7 @@
 {% load url from future %}
 {% if can_add and new_textblock and not view_options.hide_empty_textblocks %}
 {% load i18n %}
-<div class="textblock faded" id="{{position}}_new_textblock" title="{{new_textblock.get_name}}">
+<div class="textblock faded edit_mode_listener new_textblock" id="{{position}}_new_textblock" title="{{new_textblock.get_name}}">
 	{% if templates.count %}
 	<select id="{{position}}_templates" onchange="show_textblock_template_fields(this, '{{position}}'); return true;">
 		<option name="">{{_("Select template")}}</option>
@@ -10,11 +10,12 @@
 		{% endfor %}
 	</select>
 	{% endif %}
-	<div class="editlink">
+	<div class="editlink textblock_link_button edit_mode_listener">
 		<a title="{{new_textblock.get_name}}" href="{{new_textblock.get_edit_url}}">{{_("add")}}</a>
 	</div>
 	<div class="template_fields">
-		{% blocktrans with new_textblock.position as pos %}Add textblock for {{pos}}{% endblocktrans %}
+		{{new_textblock.position}}
+		<!-- {% blocktrans with new_textblock.position as pos %}Add textblock for {{pos}}{% endblocktrans %} -->
 	</div>
 	{% for template in templates %}
 		<div id="{{position}}_fields_{{template.name}}" class="template_fields" style="display:none;">

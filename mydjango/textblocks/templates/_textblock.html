@@ -3,10 +3,10 @@
 	{% if can_edit %}
 		{% spaceless %}
 		<div>
-    		<div class="textblock draggable" id="textblock_{{textblock.pk}}" title="{{textblock.get_name}}" _id="{{textblock.pk}}">
+    		<div class="textblock edit_mode_listener draggable" id="textblock_{{textblock.pk}}" title="{{textblock.get_name}}" _id="{{textblock.pk}}">
     			<div class="textblock_drop_point" _position="{{textblock.position}}" _order="{{textblock.sort_order}}" _id="{{textblock.pk}}">&#160;</div>
     			<a name="textblock_{{textblock.position}}"></a>
-    			<div class="editlink">
+    			<div class="textblock_link_button editlink edit_mode_listener">
     				<a href="{{textblock.get_edit_url}}" onclick="_textblock_edit({{textblock.pk}},'{% url "textblock_edit" textblock.pk %}'); return false;">{{_("edit")}}</a>
     			</div>
     			{% if textblock.html %}
@@ -25,7 +25,7 @@
 		{% endif %}
 	{% endif %}
 {% endfor %}
-{% if not new_textblock %}
+{% if can_edit %}
     <div class="textblock_drop_point" _position="{{position}}" _order="0" _id="0">&#160;</div>
 {% endif %}
 {% include "_textblock_creator.html" %}

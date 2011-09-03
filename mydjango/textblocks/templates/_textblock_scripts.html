@@ -1,20 +1,51 @@
 {% if perms.textblocks.change_textblock %}
 {% load url from future %}
 <style type="text/css">
-.textblock:hover .editlink
+.textblock .editlink.edit_mode_listener.active
 {
 	display: inline;
 }
-.textblock .editlink a
+.textblock_link_button a
 {
+	color: #fff;
 	font-weight: bold;
-	color: #cc3300;
 }
 
-.textblock:hover
+.textblock_link_button
 {
-	border-color: #ebebeb;
-	border-style: dashed;
+    background-color: #2C4999;
+    border-radius: 5px;
+    padding: 5px;
+    /*	width: 100px;*/
+    text-align: center;
+}
+.textblock_link_button:hover
+{
+	background-color: #99521A;
+}
+
+#textblock_edit_mode_link
+{
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+#textblock_edit_mode_link a, .textblock .editlink a 
+{
+	color: #fff;
+	font-weight: bold;
+}
+
+.new_textblock.edit_mode_listener
+{
+    display:none;
+}
+
+.textblock.edit_mode_listener.active
+{
+    display: block;
+    border-color: #B7B7B7;
+    border-style: dashed;
     border-width: 1px;
     margin: -1px;
 }
@@ -23,32 +54,35 @@
 	font-family: "Lucida Grande", Verdana, Arial, sans-serif;
 	font-size: 11px;
 }
-.textblock span.empty, .textblock .editlink a
+.textblock .editlink a
 {
     font-size: 11px;
 }
 .textblock.faded { color: #999; }
+
 .textblock
 {
     position: relative;
 }
 .textblock.drag_active
 {
-	cursor: move;
+    cursor: move;
 }
 
 .textblock_drop_point.active
 {
-	border: 1px dotted #036;
+    border: 1px dotted #036;
+    display: block;
 }
-.textblock_drop_point.over
+.textblock_drop_point.active.over
 {
-	border-width: 3px;
-	background-color: #ccc;
+    border-width: 3px;
+    background-color: #ccc;
 }
 
 .textblock_drop_point
 {
+    display: none;
     position: relative;
 }
 .textblock.being_dragged
@@ -61,21 +95,37 @@
     display: none;
     right: 0;
     top: 0;
-    padding: 2px;
+    padding: 2px 5px;
     z-index: 9999;
 }
 </style>
 <script type="text/javascript">
 
+var _textblock_edit_mode = false;
+
+function textblock_toggle_edit_mode()
+{
+    if (_textblock_edit_mode)
+    {
+        _textblock_enable_dnd();
+        _textblock_edit_mode = false;
+        $$(".edit_mode_listener").removeClass("active");
+    }
+    else
+    {
+        _textblock_disable_dnd();
+        _textblock_edit_mode = true;
+        $$(".edit_mode_listener").addClass("active");
+    }
+}
+
 function _textblock_edit(textblock_id, url)
 {
-    _textblock_disable_dnd();
     __textblock_inline_editor($('textblock_'+textblock_id).getParent(), url);
     return false;
 }
 function _textblock_cancel_editing(textblock_id, url)
 {
-    _textblock_enable_dnd();
     __textblock_inline_editor($('textblock_editing_'+textblock_id).getParent(), url);
 }
 
@@ -182,7 +232,7 @@ function _textblock_enable_dnd()
             _textblock_drag_n_drop_elements.push(
                 new Drag.Move(drag, { 
                     droppables: '.textblock_drop_point',
-                    precalculate: true, 
+                    precalculate: false, 
                     onDrop: function(el,droppable) {
                         if (!droppable || !_textblock_check_drop_point(el, droppable))
                         {
@@ -205,19 +255,13 @@ function _textblock_enable_dnd()
                     {
                         el.removeClass("being_dragged");
                         _textblock_is_dragging = false;
-                        $$(".textblock_drop_point").each(function(droppable)
-                        {
-                            droppable.removeClass('active');
-                        });
+                        $$(".textblock_drop_point").removeClass('active');
                     },
                     onCancel: function(el)
                     {
                         _textblock_is_dragging = false;
                         el.removeClass("being_dragged");
-                        $$(".textblock_drop_point").each(function(droppable)
-                        {
-                            droppable.removeClass('active');
-                        });
+                        $$(".textblock_drop_point").removeClass('active');
                     },
                     onBeforeStart: function(el)
                     {

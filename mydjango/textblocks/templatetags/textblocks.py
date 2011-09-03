@@ -66,13 +66,14 @@ def _get_textblock(context, url, position, raw = False, exclude_url_parts = 0, h
         qs = cached_textblocks
         count = len(qs)
         
+    user = context['request'].user
     new_context = {
         'context': context,
         'textblock_count': count,
         'textblocks': qs,
-        'can_edit': context['request'].user.has_perm("textblocks.change_textblock"),
-        'can_add': context['request'].user.has_perm("textblocks.add_textblock"),
-        'can_delete': context['request'].user.has_perm("textblocks.delete_textblock"),
+        'can_edit': user.has_perm("textblocks.change_textblock"),
+        'can_add': user.has_perm("textblocks.add_textblock"),
+        'can_delete': user.has_perm("textblocks.delete_textblock"),
         'view_options': context.get('view_options',None),
         'templates': TextBlockTemplate.objects.all(),
         'position': position
@@ -84,10 +85,14 @@ def _get_textblock(context, url, position, raw = False, exclude_url_parts = 0, h
             url = '/'+'/'.join(parts[:(exclude_url_parts*-1)])+'/'
         else:
             url = '/'
-    if position == "new":
-        new_context['new_textblock'] = TextBlock(url=url,sort_order=new_sort_order+1, position=position)
+    new_context['new_textblock'] = TextBlock(url=url,sort_order=new_sort_order+1, position=position)
     new_context['named_textblocks'] = TextBlock.objects.exclude(note__isnull=True).exclude(note='').order_by('note')
     return new_context
+
+@register.simple_tag
+def textblock_edit_mode_button():
+    return mark_safe("<div id='textblock_edit_mode_link' class='textblock_link_button'><a href='#' onclick='textblock_toggle_edit_mode();'>Edit Textblocks</a></div>")
+textblock_edit_mode_button.is_safe = True
 
 @register.simple_tag
 def textstring(name):
