@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+from django import forms
 from django.utils.translation import ugettext as _
 from django.db import models
 from django.core import exceptions as django_exceptions
