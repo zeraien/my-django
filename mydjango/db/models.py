@@ -5,6 +5,7 @@ from django import forms
 from django.utils.translation import ugettext as _
 from django.db import models
 from django.core import exceptions as django_exceptions
+from mydjango.db.forms import JSONFormField
 
 class JSONFieldBase(models.Field):
     __metaclass__ = models.SubfieldBase
@@ -42,7 +43,7 @@ class JSONFieldBase(models.Field):
         return value
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.CharField}
+        defaults = {'form_class': JSONFormField}
         defaults.update(kwargs)
         return super(JSONFieldBase, self).formfield(**defaults)
 
