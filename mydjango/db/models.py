@@ -1,10 +1,10 @@
-import datetime
 import json
 import logging
 from django import forms
 from django.utils.translation import ugettext as _
 from django.db import models
 from django.core import exceptions as django_exceptions
+from django.utils import timezone
 from mydjango.db.forms import JSONFormField
 
 class JSONFieldBase(models.Field):
@@ -87,5 +87,5 @@ class TimeStampedModel(models.Model):
     """
     class Meta:
         abstract = True
-    created_at = models.DateTimeField(default=datetime.datetime.now, blank=True, editable=False, db_index=True)
+    created_at = models.DateTimeField(default=timezone.now, blank=True, editable=False, db_index=True)
     last_modified_at = models.DateTimeField(auto_now=True, db_index=True)

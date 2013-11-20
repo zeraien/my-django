@@ -7,10 +7,8 @@ from django.core.cache import cache
 
 from django.conf import settings
 
-from django.contrib.markup.templatetags import markup
-
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+# from django.contrib.contenttypes.models import ContentType
+# from django.contrib.contenttypes import generic
 
 import re
 
@@ -95,9 +93,13 @@ class TextBlock(models.Model):
 
 def textblock_pre_save(sender, instance, **kwargs):
     cache.clear()
-        
-    if hasattr(markup, instance.markup_language):
-        instance.html = getattr(markup, instance.markup_language)(instance.content)
+
+    if instance.markup_language == "markdown":
+        import markdown
+        instance.html = markdown.to_html_string(instance.content)
+    elif instance.markup_language == 'textile':
+        import textile
+        instance.html = textile.textile(instance.content)
     else:
         instance.html = instance.content
 pre_save.connect(textblock_pre_save, sender=TextBlock)
