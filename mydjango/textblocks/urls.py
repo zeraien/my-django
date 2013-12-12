@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 urlpatterns = patterns('mydjango.textblocks.views',
 	url(r'^(?P<textblock_id>\d+)/$','display',name="textblock_display"),

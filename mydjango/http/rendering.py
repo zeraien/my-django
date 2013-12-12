@@ -4,7 +4,6 @@ import json
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponsePermanentRedirect
-from django.core.xheaders import populate_xheaders
 from django.utils.decorators import available_attrs
 
 from functools import wraps
@@ -19,8 +18,6 @@ def render(request, template, context = {}, ignore_ajax = False, obj=None, **ren
         response = render_to_response(template, context)
     else:
         response = render_to_response(template, context, context_instance=RequestContext(request), **render_kwargs)
-    if obj is not None:
-        populate_xheaders(request, response, obj.__class__, obj.pk)
     return response
     
 def permanent_redirect(view_func):
