@@ -96,7 +96,7 @@ def textblock_pre_save(sender, instance, **kwargs):
 
     if instance.markup_language == "markdown":
         import markdown
-        instance.html = markdown.to_html_string(instance.content)
+        instance.html = markdown.markdown(instance.content)
     elif instance.markup_language == 'textile':
         import textile
         instance.html = textile.textile(instance.content)
