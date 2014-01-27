@@ -1,4 +1,5 @@
 import datetime
+import calendar
 from django.conf import settings
 from django.contrib.auth import logout, SESSION_KEY, BACKEND_SESSION_KEY
 from django.http import HttpResponseRedirect
@@ -14,19 +15,22 @@ class LoginTimeoutMiddleware(object):
     def process_request(self, request):
         assert hasattr(request, 'user'), "The MyDjango security middleware requires auth middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.auth.middleware.AuthenticationMiddleware'."
 
+        now_epoch = calendar.timegm(timezone.now().utctimetuple())
         if request.user.is_authenticated():
             if LOGIN_TIMEOUT_SESSION_KEY in request.session:
                 last_visit = request.session[LOGIN_TIMEOUT_SESSION_KEY]
             else:
-                last_visit = None
-            request.session[LOGIN_TIMEOUT_SESSION_KEY] = timezone.now()
+                last_visit = 0
+            request.session[LOGIN_TIMEOUT_SESSION_KEY] = now_epoch
 
             timeout = getattr(settings, 'LOGIN_TIMEOUT_HOURS', 72)
             delta = datetime.timedelta(hours=timeout)
 
-            if last_visit is None:
+            if last_visit == 0:
                 last_visit = request.user.last_login
-            
+            else:
+                last_visit = datetime.datetime.utcfromtimestamp(last_visit)
+
             try:
                 diff = (timezone.now() - last_visit)
                 if diff > delta:
@@ -37,4 +41,4 @@ class LoginTimeoutMiddleware(object):
             except TypeError:
                 pass
             
-        request.session[LOGIN_TIMEOUT_SESSION_KEY] = timezone.now()
+        request.session[LOGIN_TIMEOUT_SESSION_KEY] = now_epoch
