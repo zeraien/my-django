@@ -1,4 +1,4 @@
-{% load textblocks %}{% load url from future %}
+{% load staticfiles %}{% load textblocks %}{% load url from future %}
 {% for textblock in textblocks %}
 	{% if can_edit %}
 		{% spaceless %}
@@ -6,8 +6,9 @@
     		<div class="textblock edit_mode_listener draggable" id="textblock_{{textblock.pk}}" title="{{textblock.get_name}}" _id="{{textblock.pk}}">
     			<div class="textblock_drop_point" _position="{{textblock.position}}" _order="{{textblock.sort_order}}" _id="{{textblock.pk}}">&#160;</div>
     			<a name="textblock_{{textblock.position}}"></a>
-    			<div class="textblock_link_button editlink edit_mode_listener">
-    				<a href="{{textblock.get_edit_url}}" onclick="_textblock_edit({{textblock.pk}},'{% url "textblock_edit" textblock.pk %}'); return false;">{{_("edit")}}</a>
+    			<div class="editlink edit_mode_listener">
+    				<a href="{{textblock.get_edit_url}}" onclick="_textblock_edit({{textblock.pk}},'{% url "textblock_edit" textblock.pk %}'); return false;">
+                    <img src='{% static "icon_change.gif" %}' title="{{_("edit")}}"/></a>
     			</div>
     			{% if textblock.html %}
     				{% parse_as_template textblock context %}

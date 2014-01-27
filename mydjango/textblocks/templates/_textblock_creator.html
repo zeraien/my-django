@@ -1,4 +1,4 @@
-{% load url from future %}
+{% load url from future %}{% load staticfiles %}
 {% if can_add and new_textblock and not view_options.hide_empty_textblocks %}
 {% load i18n %}
 <div class="textblock faded edit_mode_listener new_textblock" id="{{position}}_new_textblock" title="{{new_textblock.get_name}}">
@@ -10,8 +10,8 @@
 		{% endfor %}
 	</select>
 	{% endif %}
-	<div class="editlink textblock_link_button edit_mode_listener">
-		<a title="{{new_textblock.get_name}}" href="{{new_textblock.get_edit_url}}">{{_("add")}}</a>
+	<div class="editlink edit_mode_listener">
+		<a title="{{new_textblock.get_name}}" href="{{new_textblock.get_edit_url}}"><img src='{% static "icon_add.gif" %}' title="{{_("add")}}"/></a>
 	</div>
 	<div class="template_fields">
 		{{new_textblock.position}}
