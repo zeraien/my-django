@@ -1,0 +1,7 @@
+{% if perms.textblocks.change_textblock %}
+{% include "_textblock_scripts.html" %}
+<script src="//code.jquery.com/jquery.js"></script>
+<script type="text/javascript">
+    {% include "_textblock_jquery.js" %}
+</script>
+{% endif %}

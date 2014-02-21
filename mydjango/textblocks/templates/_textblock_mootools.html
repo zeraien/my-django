@@ -1,0 +1,6 @@
+{% if perms.textblocks.change_textblock %}
+{% include "_textblock_scripts.html" %}
+<script type="text/javascript">
+    {% include "_textblock_mootools.js" %}
+</script>
+{% endif %}

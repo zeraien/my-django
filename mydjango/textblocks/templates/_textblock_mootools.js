@@ -1,21 +1,11 @@
-{% load url from future %}
 var _textblock_edit_mode = false;
-
-function get_element_by_id(element_id)
-{
-	return $("#"+element_id);
-}
-function get_element_list_by_class_name(class_name)
-{
-	return $("."+class_name);
-}
 
 function textblock_toggle_drag_n_drop_mode()
 {
     if (_textblock_drag_n_drop_activated)
     {
         _textblock_drag_n_drop_activated = !_textblock_drag_n_drop_activated;
-        get_element_by_id('textblock_drag_n_drop_toggle_button').removeClass('activated');
+        $('textblock_drag_n_drop_toggle_button').removeClass('activated');
         _textblock_disable_dnd();
     }
     else
@@ -24,7 +14,7 @@ function textblock_toggle_drag_n_drop_mode()
             textblock_toggle_edit_mode();
 
         _textblock_drag_n_drop_activated = !_textblock_drag_n_drop_activated;
-        get_element_by_id('textblock_drag_n_drop_toggle_button').addClass('activated');
+        $('textblock_drag_n_drop_toggle_button').addClass('activated');
         _textblock_enable_dnd();
     }
 }
@@ -33,39 +23,38 @@ function textblock_toggle_edit_mode()
 {
     if (_textblock_edit_mode)
     {
-        get_element_by_id('textblock_edit_mode_link').removeClass('activated');
+        $('textblock_edit_mode_link').removeClass('activated');
         _textblock_edit_mode = false;
-        get_element_list_by_class_name("edit_mode_listener").removeClass("active");
+        $$(".edit_mode_listener").removeClass("active");
     }
     else
     {
         if (_textblock_drag_n_drop_activated)
             textblock_toggle_drag_n_drop_mode();
 
-        get_element_by_id('textblock_edit_mode_link').addClass('activated');
+        $('textblock_edit_mode_link').addClass('activated');
         _textblock_edit_mode = true;
-        get_element_list_by_class_name("edit_mode_listener").addClass("active");
+        $$(".edit_mode_listener").addClass("active");
     }
 }
 
 function _textblock_edit(textblock_id, url)
 {
-    __textblock_inline_editor(get_element_by_id('textblock_'+textblock_id).parent(), url);
+    __textblock_inline_editor($('textblock_'+textblock_id).getParent(), url);
     return false;
 }
 function _textblock_cancel_editing(textblock_id, url)
 {
-    __textblock_inline_editor(get_element_by_id('textblock_editing_'+textblock_id).parent(), url);
+    __textblock_inline_editor($('textblock_editing_'+textblock_id).getParent(), url);
 }
 
 function __textblock_inline_editor(div, url)
 {
-    div.load( url);
-//	div.set('load', {
-//		evalScripts: true,
-//		data: null
-//	});
-//	div.load(url);
+	div.set('load', {
+		evalScripts: true,
+		data: null
+	});
+	div.load(url);
 	return false;
 }
 
@@ -91,39 +80,41 @@ function submit_textblock_inline_form(form)
 
 function go_textblock(self, url)
 {
-	window.location = self.getSelected()[0].attr('name');
+	window.location = self.getSelected()[0].get('name');
 }
 
 function submit_textblock_template(div_id, url)
 {
-	var form = $("#"+div_id+" .template_form input[name='content']");
-	var template = decodeURIComponent(form.val());
-	$("#"+div_id+' .template_form input').each(function(field)
+	var form = $(div_id).getElement('.template_form');
+	var template = decodeURIComponent(form['content'].value);
+	form.getElements('input').each(function(field)
 	{
 		template = template.replace("[["+field.name+"]]", field.value);
 	});
-	form.val(template);
+	form['content'].value = template;
 	return true;
 }
 
 function show_textblock_template_fields(self, position)
 {
-    var div_id = position+"_fields_"+self.getSelected()[0].attr('name');
+    var div_id = position+"_fields_"+self.getSelected()[0].get('name');
 
- 	$(".template_fields").css('display',"none");
+ 	$$(".template_fields").each(function(the_div){
+		the_div.setStyle('display',"none");
+	});
 
- 	var textblock = get_element_by_id(position+"_new_textblock");
+ 	var textblock = $(position+"_new_textblock");
 
-	textblock.unbind('mouseover');
-	textblock.unbind('mouseout');
+	textblock.removeEvents('mouseover');
+	textblock.removeEvents('mouseout');
 	textblock.removeClass("faded");
-	get_element_by_id(div_id).css('display',"block");
+	$(div_id).setStyle('display',"block");
 }
 
 function _textblock_check_drop_point(draggable, droppable)
 {
-    var draggable_id = $(droppable).attr("_id");
-    var droppable_id = $(droppable).attr("_id");
+    var draggable_id = draggable.get("_id");
+    var droppable_id = droppable.get("_id");
     if (draggable_id == droppable_id)
         return false;
     else
@@ -156,19 +147,16 @@ function _textblock_enable_dnd()
     if (!_textblock_drag_n_drop_enabled)
     {
         _textblock_drag_n_drop_enabled = true;
-        var draggable = $('.textblock.draggable');
-        draggable.addClass('drag_active');
-        draggable.css('top',0);
-        draggable.css('left',0);
+        $$('.textblock.draggable').each(function(drag) {
 
-        draggable.each(function(index, drag) {
+            drag.addClass('drag_active');
+            drag.setStyles({ 'top':0, 'left':0 });
 
             _textblock_drag_n_drop_elements.push(
-                new Drag.Move(drag, {
+                new Drag.Move(drag, { 
                     droppables: '.textblock_drop_point',
                     precalculate: false, 
                     onDrop: function(el,droppable) {
-                        var droppableEl = $(droppable);
                         if (!droppable || !_textblock_check_drop_point(el, droppable))
                         {
                             el.setPosition(_textblock_original_position);
@@ -176,7 +164,7 @@ function _textblock_enable_dnd()
                         }
                         var request = new Request({
                             url: '{% url "textblock_drop" %}',
-                            data: "id="+$(drag).attr('_id')+"&drop_position="+droppableEl.attr('_position')+"&drop_sort_order="+droppableEl.attr("_order"),
+                            data: "id="+drag.get('_id')+"&drop_position="+droppable.get('_position')+"&drop_sort_order="+droppable.get("_order"),
                             method: "post",
                             onSuccess: function(response)
                             {
@@ -190,22 +178,22 @@ function _textblock_enable_dnd()
                     {
                         el.removeClass("being_dragged");
                         _textblock_is_dragging = false;
-                        $(".textblock_drop_point").removeClass('active');
+                        $$(".textblock_drop_point").removeClass('active');
                     },
                     onCancel: function(el)
                     {
                         _textblock_is_dragging = false;
                         el.removeClass("being_dragged");
-                        $(".textblock_drop_point").removeClass('active');
+                        $$(".textblock_drop_point").removeClass('active');
                     },
                     onBeforeStart: function(el)
                     {
                         _textblock_original_position = el.getCoordinates();
-                        $(el).addClass("being_dragged");
+                        el.addClass("being_dragged");
                         if (!_textblock_is_dragging)
                         {
                             _textblock_is_dragging = true;
-                            $(".textblock_drop_point").each(function(index, droppable)
+                            $$(".textblock_drop_point").each(function(droppable)
                             {
                                 if (_textblock_check_drop_point(el, droppable))
                                 droppable.addClass('active');
@@ -226,3 +214,8 @@ function _textblock_enable_dnd()
         });
     }
 }
+
+window.addEvent("domready", function()
+{
+    document.ondragstart = function () { return false; }; //IE drag hack
+});

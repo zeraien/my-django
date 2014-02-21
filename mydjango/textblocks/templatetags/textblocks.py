@@ -120,7 +120,12 @@ def textblock_creator(context):
     """Display a text block creation form. The newly created text block can be drag and dropped on to any text block position on the site."""
     return _get_textblock(context=context, url=context['request'].path, position='new')
     
-@register.inclusion_tag('_textblock_scripts.html',takes_context=True)
+@register.inclusion_tag('_textblock_mootools.html',takes_context=True)
 def load_textblock_support(context):
+    """Prints out CSS and HTML code needed for text block administration to work"""
+    return context
+
+@register.inclusion_tag('_textblock_jquery.html',takes_context=True)
+def load_textblock_support_jquery(context):
     """Prints out CSS and HTML code needed for text block administration to work"""
     return context
