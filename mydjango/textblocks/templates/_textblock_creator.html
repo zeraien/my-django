@@ -1,4 +1,4 @@
-{% load url from future %}{% load staticfiles %}
+{% load url from future %}{% load static %}
 {% if can_add and new_textblock and not view_options.hide_empty_textblocks %}
 {% load i18n %}
 <div class="textblock faded edit_mode_listener new_textblock" id="{{position}}_new_textblock" title="{{new_textblock.get_name}}">
