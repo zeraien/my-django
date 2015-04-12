@@ -1,2 +1,2 @@
 VERSION = (0,2,1)
-__version__ = '.'.join(VERSION)
+__version__ = '%d.%d.%d' % VERSION
