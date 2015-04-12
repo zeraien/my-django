@@ -3,3 +3,5 @@
 *.pyc
 build
 .idea
+dist/
+*.egg-info/
