@@ -12,7 +12,7 @@ setup(
     author='Dmitri Fedortchenko',
     author_email='d@angelhill.net',
     url='https://github.com/zeraien/my-django/',
-    packages=['mydjango'],
+    packages=['mydjango', 'mydjango.db', 'mydjango.http', 'mydjango.security', 'mydjango.textblocks'],
     package_data={
         'mydjango.textblocks': ['templates/*.html', 'templates/*.js', 'static/*.gif'],
     },
