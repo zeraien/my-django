@@ -1,8 +1,6 @@
 import datetime
 from traceback import format_exc
-from django.db import transaction
 
-from django.utils.encoding import smart_unicode
 from django.conf import settings
 
 from mydjango.logging.models import LogEntry
@@ -22,7 +20,6 @@ def exception_debug(msg = None, request = None):
 def exception(msg, request=None):
     error(msg,exception_str=format_exc(),request=request)
     
-@transaction.autocommit
 def error(msg, exception_str=None, request = None, level = "ERROR"):
     title = msg
     if exception_str is not None:
@@ -40,8 +37,7 @@ def error(msg, exception_str=None, request = None, level = "ERROR"):
     
 def info(msg,request = None):
     log('INFO', msg, request)
-    
-@transaction.autocommit
+
 def log(level, msg, request = None):
     localtime = datetime.datetime.now()
     ctime = localtime.ctime()
@@ -52,7 +48,7 @@ def log(level, msg, request = None):
         else:
             ip = None
         if settings.DEBUG:
-            print """[%(level)s] %(fancytime)s: %(msg)s""" % locals()
+            print(u"""[%(level)s] %(fancytime)s: %(msg)s""" % locals())
         LogEntry.objects.create(level=level, message=msg, ip_address=ip, created_at=localtime)
     except Exception, e:
         if not settings.DEBUG:
