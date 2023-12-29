@@ -31,7 +31,7 @@ class TextBlockManager(models.Manager):
                 q |= Q(url='%s*' % query_url)
                 query_url += '/'
         
-        base_qs = self.select_related(depth=1).filter(is_hidden=False).distinct()
+        base_qs = self.filter(is_hidden=False).distinct()
 
         hidden_tbs = URLItem.objects.filter(is_hidden=True).filter(q).filter(**kwargs).distinct()
 
@@ -64,11 +64,11 @@ class TextBlock(models.Model):
         
     def get_edit_url(self):
         if self.pk:
-            return reverse('admin:%s_%s_change' % (self._meta.app_label, self._meta.module_name), args=(self.pk,))
+            return reverse('admin:%s_%s_change' % (self._meta.app_label, self._meta.model_name), args=(self.pk,))
         else:
             import urllib
             qs = urllib.urlencode({'position':self.position, 'url': self.url, 'sort_order': self.sort_order})
-            return reverse('admin:%s_%s_add' % (self._meta.app_label, self._meta.module_name))+"?"+qs
+            return reverse('admin:%s_%s_add' % (self._meta.app_label, self._meta.model_name))+"?"+qs
     
     def get_absolute_url(self):
         url = "/"

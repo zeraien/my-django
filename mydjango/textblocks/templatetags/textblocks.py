@@ -3,11 +3,9 @@
 import sys
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.safestring import mark_safe
 from django.core.cache import cache
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
-from django.utils import html
 
 from django import template
 register = template.Library()
@@ -17,9 +15,9 @@ from mydjango.textblocks.models import TextBlock, TextBlockTemplate
 
 @register.simple_tag
 def parse_as_template(textblock, context):
-    from django.template import Context, loader
+    from django.template import Context, engines
     try:
-        template_ = loader.get_template_from_string(textblock.html)
+        template_ = engines['django'].from_string(textblock.html)
         return template_.render(Context(context))
     except:
         log.exception_warn("Failed to render text block template.")

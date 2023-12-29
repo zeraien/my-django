@@ -2,8 +2,7 @@ import datetime
 from traceback import format_exc
 
 from django.conf import settings
-
-from mydjango.logging.models import LogEntry
+from django.utils import timezone
 
 LEVELS = ['JOB', 'DEBUG', 'INFO', 'WARN', 'ERROR']
 
@@ -39,7 +38,8 @@ def info(msg,request = None):
     log('INFO', msg, request)
 
 def log(level, msg, request = None):
-    localtime = datetime.datetime.now()
+    from mydjango.logging.models import LogEntry
+    localtime = timezone.now()
     ctime = localtime.ctime()
     fancytime = localtime.strftime("%Y-%m-%d %H:%M")
     try:

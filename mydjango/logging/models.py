@@ -5,7 +5,7 @@ import datetime
 class LogEntry(models.Model):
     created_at = models.DateTimeField(default=datetime.datetime.now)
     level = models.CharField(max_length=20,db_index=True)
-    ip_address = models.IPAddressField(null=True,blank=True)
+    ip_address = models.GenericIPAddressField(null=True,blank=True)
     message = models.TextField()
         
     class Meta:

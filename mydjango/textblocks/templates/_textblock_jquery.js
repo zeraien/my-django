@@ -1,4 +1,3 @@
-{% load url from future %}
 var _textblock_edit_mode = false;
 
 function get_element_by_id(element_id)
